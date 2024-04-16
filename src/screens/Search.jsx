@@ -22,6 +22,8 @@ export const Search = () => {
         iconColor={colors.navy}
         onChangeText={setKeyword}
         value={keyword}
+        style={styles.searchBar}
+        inputStyle={{ fontSize: 14, paddingBottom: 14 }}
       />
       <CardList />
     </View>
@@ -33,6 +35,12 @@ const styles = StyleSheet.create({
   btnsWrap: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+  },
+
+  searchBar: {
+    backgroundColor: colors.turquoise,
+    marginVertical: 12,
+    height: 40,
+    alignItems: 'center',
   },
 });
