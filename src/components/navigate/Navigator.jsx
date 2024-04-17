@@ -1,5 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import { NavigationContainer } from '@react-navigation/native'; // 추가
+import { NavigationContainer } from '@react-navigation/native';
 import { PersonProfile } from '../../screens/PersonProfile';
 import { TabNavigation } from './TabNavigation';
 

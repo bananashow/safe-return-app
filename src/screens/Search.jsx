@@ -3,9 +3,19 @@ import { Button, Searchbar } from 'react-native-paper';
 import { colors } from '../styles/theme';
 import { CardList } from '../components/card/CardList';
 import { useState } from 'react';
+import { useQuery } from 'react-query';
+import { SAFE_URL, SAFE_ID, SAFE_KEY } from '@env';
+import axios from 'axios';
+import { QUERY_KEY } from '../api/queryKey';
 
 export const Search = () => {
   const [keyword, setKeyword] = useState('');
+  const PAGE = 1;
+
+  const { data } = useQuery({
+    queryKey: [QUERY_KEY.GET_PERSON],
+    queryFn: () => axios.get(`${SAFE_URL}?esntlId=${SAFE_ID}&authKey=${SAFE_KEY}&rowSize=10&page=${PAGE}`),
+  });
 
   return (
     <View style={styles.container}>
@@ -25,7 +35,7 @@ export const Search = () => {
         style={styles.searchBar}
         inputStyle={{ fontSize: 14, paddingBottom: 14 }}
       />
-      <CardList />
+      <CardList personList={data?.data?.list} cardWitdth={'48%'} />
     </View>
   );
 };
