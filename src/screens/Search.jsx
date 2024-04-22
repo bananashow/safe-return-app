@@ -2,26 +2,37 @@ import { StyleSheet, View } from 'react-native';
 import { Button, Searchbar } from 'react-native-paper';
 import { colors } from '../styles/theme';
 import { CardList } from '../components/card/CardList';
-import { useState } from 'react';
-import { useInfiniteQuery } from 'react-query';
+import { useEffect, useState } from 'react';
 import { SAFE_URL, SAFE_ID, SAFE_KEY } from '@env';
 import axios from 'axios';
+import { useInfiniteQuery } from 'react-query';
 import { QUERY_KEY } from '../api/queryKey';
 
 export const Search = ({ navigation }) => {
   const [keyword, setKeyword] = useState('');
-  const SIZE = 2;
+  const SIZE = 10;
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+  const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: [QUERY_KEY.GET_PERSON],
     queryFn: ({ pageParam = 1 }) =>
       axios.get(`${SAFE_URL}?esntlId=${SAFE_ID}&authKey=${SAFE_KEY}&rowSize=${SIZE}&page=${pageParam}`),
-    getNextPageParam: (lastPage, allPages) => {},
-    keepPreviousData: true,
+    getNextPageParam: (lastPage, allPages) => {
+      const totalItems = lastPage.data.totalCount;
+      const currentPage = allPages.length + 1;
+      const totalPages = Math.ceil(totalItems / SIZE);
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    enabled: false,
   });
 
-  const loadMore = () => {
+  useEffect(() => {
     fetchNextPage();
+  }, []);
+
+  const loadMore = () => {
+    if (!isFetchingNextPage) {
+      fetchNextPage();
+    }
   };
 
   return (
@@ -43,11 +54,11 @@ export const Search = ({ navigation }) => {
         inputStyle={{ fontSize: 14, paddingBottom: 14 }}
       />
       <CardList
-        // personList={data?.data?.list}
         personList={data?.pages?.flatMap((page) => page.data.list ?? [])}
         cardStyle={{ width: '48%' }}
         navigation={navigation}
         loadMore={loadMore}
+        hasNextPage={hasNextPage}
       />
     </View>
   );
