@@ -7,12 +7,18 @@ import { SAFE_URL, SAFE_ID, SAFE_KEY } from '@env';
 import axios from 'axios';
 import { useInfiniteQuery } from 'react-query';
 import { QUERY_KEY } from '../api/queryKey';
+import { FilterModal } from '../components/common/FilterModal';
 
 export const Search = ({ navigation }) => {
+  const [filterIsOpen, setFilterIsOpen] = useState(false);
   const [keyword, setKeyword] = useState('');
-  const SIZE = 10;
+  const SIZE = 6;
 
-  const { data, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage } = useInfiniteQuery({
+  const handleModal = (isOpen) => {
+    setFilterIsOpen(isOpen);
+  };
+
+  const { data, fetchNextPage, isFetchingNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: [QUERY_KEY.GET_PERSON],
     queryFn: ({ pageParam = 1 }) =>
       axios.get(`${SAFE_URL}?esntlId=${SAFE_ID}&authKey=${SAFE_KEY}&rowSize=${SIZE}&page=${pageParam}`),
@@ -41,7 +47,7 @@ export const Search = ({ navigation }) => {
         <Button icon="map" mode="contained" buttonColor={colors.navy} onPress={() => console.log('지도로 보기')}>
           지도로 보기
         </Button>
-        <Button icon="filter" mode="outlined" textColor={colors.navy} onPress={() => console.log('필터')}>
+        <Button icon="filter" mode="outlined" textColor={colors.navy} onPress={() => handleModal(true)}>
           필터
         </Button>
       </View>
@@ -60,6 +66,7 @@ export const Search = ({ navigation }) => {
         loadMore={loadMore}
         hasNextPage={hasNextPage}
       />
+      {filterIsOpen && <FilterModal isOpen={filterIsOpen} handleModal={handleModal} />}
     </View>
   );
 };
