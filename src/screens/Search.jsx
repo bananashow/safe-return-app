@@ -3,19 +3,26 @@ import { Button, Searchbar } from 'react-native-paper';
 import { colors } from '../styles/theme';
 import { CardList } from '../components/card/CardList';
 import { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useInfiniteQuery } from 'react-query';
 import { SAFE_URL, SAFE_ID, SAFE_KEY } from '@env';
 import axios from 'axios';
 import { QUERY_KEY } from '../api/queryKey';
 
-export const Search = () => {
+export const Search = ({ navigation }) => {
   const [keyword, setKeyword] = useState('');
-  const PAGE = 1;
+  const SIZE = 2;
 
-  const { data } = useQuery({
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: [QUERY_KEY.GET_PERSON],
-    queryFn: () => axios.get(`${SAFE_URL}?esntlId=${SAFE_ID}&authKey=${SAFE_KEY}&rowSize=10&page=${PAGE}`),
+    queryFn: ({ pageParam = 1 }) =>
+      axios.get(`${SAFE_URL}?esntlId=${SAFE_ID}&authKey=${SAFE_KEY}&rowSize=${SIZE}&page=${pageParam}`),
+    getNextPageParam: (lastPage, allPages) => {},
+    keepPreviousData: true,
   });
+
+  const loadMore = () => {
+    fetchNextPage();
+  };
 
   return (
     <View style={styles.container}>
@@ -35,7 +42,13 @@ export const Search = () => {
         style={styles.searchBar}
         inputStyle={{ fontSize: 14, paddingBottom: 14 }}
       />
-      <CardList personList={data?.data?.list} cardWitdth={'48%'} />
+      <CardList
+        // personList={data?.data?.list}
+        personList={data?.pages?.flatMap((page) => page.data.list ?? [])}
+        cardStyle={{ width: '48%' }}
+        navigation={navigation}
+        loadMore={loadMore}
+      />
     </View>
   );
 };

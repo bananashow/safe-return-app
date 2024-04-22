@@ -1,30 +1,36 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 import { formatColor, formatTarget } from '../../format/formatPerson';
 
-export const CardCover = ({ cardWitdth, personInfo }) => {
-  console.log(personInfo?.writngTrgetDscd);
+export const CardCover = ({ cardStyle, personInfo, navigation }) => {
+  const handleCard = () => {
+    navigation.navigate('실종자 정보', { personInfo });
+  };
+
   return (
-    <Card style={{ ...styles.card, width: cardWitdth }}>
-      <Card.Cover source={{ uri: `data:image/jpeg;base64,${personInfo?.tknphotoFile}` }} />
-      <View style={{ ...styles.badge, backgroundColor: formatColor(personInfo?.writngTrgetDscd) }}>
-        <Text style={styles.badgeText}>{formatTarget(personInfo?.writngTrgetDscd)}</Text>
-      </View>
-      <Text style={{ ...styles.text, marginTop: 6 }}>이름 : {personInfo?.nm}</Text>
-      <Text style={styles.text}>성별 : {personInfo?.sexdstnDscd}</Text>
-      <Text style={styles.text}>당시 나이 : {personInfo?.age}세</Text>
-      <Text style={styles.text}>현재 나이 : {personInfo?.ageNow}세</Text>
-      <Text style={styles.text}>발생 일시 : {personInfo?.occrde}</Text>
-      <Text style={{ ...styles.text, marginBottom: 6 }}>발생 장소 : {personInfo?.occrAdres}</Text>
-    </Card>
+    <TouchableOpacity style={{ ...styles.cardWrap, ...cardStyle }} onPress={handleCard}>
+      <Card>
+        <Card.Cover source={{ uri: `data:image/jpeg;base64,${personInfo?.tknphotoFile}` }} />
+        <View style={{ ...styles.badge, backgroundColor: formatColor(personInfo?.writngTrgetDscd) }}>
+          <Text style={styles.badgeText}>{formatTarget(personInfo?.writngTrgetDscd)}</Text>
+        </View>
+        <Text style={{ ...styles.text, marginTop: 6 }}>이름 : {personInfo?.nm}</Text>
+        <Text style={styles.text}>성별 : {personInfo?.sexdstnDscd}</Text>
+        <Text style={styles.text}>당시 나이 : {personInfo?.age}세</Text>
+        <Text style={styles.text}>현재 나이 : {personInfo?.ageNow}세</Text>
+        <Text style={styles.text}>발생 일시 : {personInfo?.occrde}</Text>
+        <Text style={{ ...styles.text, ...styles.location }}>발생 장소 : {personInfo?.occrAdres}</Text>
+      </Card>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
+  cardWrap: {
     marginBottom: 12,
-    height: 'inherit',
   },
+
+  location: { marginBottom: 6, minHeight: 25 },
 
   text: {
     fontSize: 11,

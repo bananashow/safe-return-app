@@ -1,3 +1,37 @@
+export const formatDetailTarget = (code) => {
+  let target = '';
+  switch (code) {
+    case '010':
+      target = '정상 아동(18세 미만)';
+      break;
+    case '020':
+      target = '가출인';
+      break;
+    case '040':
+      target = '시설보호 무연고자';
+      break;
+    case '060':
+      target = '지적장애인';
+      break;
+    case '061':
+      target = '지적장애인(18세 미만)';
+      break;
+    case '062':
+      target = '지적장애인(18세 이상)';
+      break;
+    case '070':
+      target = '치매질환자';
+      break;
+    case '080':
+      target = '불상(기타)';
+      break;
+    default:
+      target = '불상(기타)';
+      break;
+  }
+  return target;
+};
+
 export const formatTarget = (code) => {
   let target = '';
   switch (code) {

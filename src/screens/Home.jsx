@@ -5,14 +5,9 @@ import { useQuery } from 'react-query';
 import { QUERY_KEY } from '../api/queryKey';
 import axios from 'axios';
 import { SAFE_URL, SAFE_ID, SAFE_KEY } from '@env';
-import { CardList } from '../components/card/CardList';
 
 export const Home = ({ navigation }) => {
-  const handleCard = () => {
-    navigation.navigate('실종자 정보');
-  };
   const PAGE = 1;
-
   const { data } = useQuery({
     queryKey: [QUERY_KEY.GET_PERSON],
     queryFn: () => axios.get(`${SAFE_URL}?esntlId=${SAFE_ID}&authKey=${SAFE_KEY}&rowSize=10&page=${PAGE}`),
@@ -24,9 +19,7 @@ export const Home = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.cardContainer} bounces={false} showsHorizontalScrollIndicator={false}>
         {data?.data?.list?.slice(0, 5).map((person) => {
           return (
-            <TouchableOpacity style={{ marginRight: 12 }} onPress={handleCard} key={person.rnum}>
-              <CardCover personInfo={person} cardWitdth={'100%'} />
-            </TouchableOpacity>
+            <CardCover key={person.rnum} personInfo={person} cardStyle={{ marginRight: 12 }} navigation={navigation} />
           );
         })}
       </ScrollView>
