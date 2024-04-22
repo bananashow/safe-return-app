@@ -1,6 +1,7 @@
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 import { formatColor, formatTarget } from '../../format/formatPerson';
+import noImage from '../../assets/no-image.jpg';
 
 export const CardCover = ({ cardStyle, personInfo, navigation }) => {
   const handleCard = () => {
@@ -10,7 +11,9 @@ export const CardCover = ({ cardStyle, personInfo, navigation }) => {
   return (
     <TouchableOpacity style={{ ...styles.cardWrap, ...cardStyle }} onPress={handleCard}>
       <Card>
-        <Card.Cover source={{ uri: `data:image/jpeg;base64,${personInfo?.tknphotoFile}` }} />
+        <Card.Cover
+          source={personInfo?.tknphotoFile ? { url: `data:image/jpeg;base64,${personInfo?.tknphotoFile}` } : noImage}
+        />
         <View style={{ ...styles.badge, backgroundColor: formatColor(personInfo?.writngTrgetDscd) }}>
           <Text style={styles.badgeText}>{formatTarget(personInfo?.writngTrgetDscd)}</Text>
         </View>
