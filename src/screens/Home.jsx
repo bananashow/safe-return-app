@@ -5,23 +5,33 @@ import { useQuery } from 'react-query';
 import { QUERY_KEY } from '../api/queryKey';
 import axios from 'axios';
 import { SAFE_URL, SAFE_ID, SAFE_KEY } from '@env';
+import { useInfiniteQuery } from 'react-query';
 
 export const Home = ({ navigation }) => {
   const PAGE = 1;
-  const { data } = useQuery({
+  const { data } = useInfiniteQuery({
     queryKey: [QUERY_KEY.GET_PERSON],
-    queryFn: () => axios.get(`${SAFE_URL}?esntlId=${SAFE_ID}&authKey=${SAFE_KEY}&rowSize=10&page=${PAGE}`),
+    queryFn: () => axios.get(`${SAFE_URL}?esntlId=${SAFE_ID}&authKey=${SAFE_KEY}&rowSize=${SIZE}&page=${pageParam}`),
   });
+
+  console.log(data);
 
   return (
     <Layout>
       <Image style={styles.logo} source={require('../assets/logo.png')} resizeMode="center" />
       <ScrollView contentContainerStyle={styles.cardContainer} bounces={false} showsHorizontalScrollIndicator={false}>
-        {data?.data?.list?.slice(0, 5).map((person) => {
-          return (
-            <CardCover key={person.rnum} personInfo={person} cardStyle={{ marginRight: 12 }} navigation={navigation} />
-          );
-        })}
+        {data?.pages
+          ?.flatMap((page) => page.data.list.slice(0, 5))
+          .map((person) => {
+            return (
+              <CardCover
+                key={person.rnum}
+                personInfo={person}
+                cardStyle={{ marginRight: 12, width: 200 }}
+                navigation={navigation}
+              />
+            );
+          })}
       </ScrollView>
     </Layout>
   );
