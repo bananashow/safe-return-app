@@ -4,11 +4,14 @@ import RNPickerSelect from 'react-native-picker-select';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { colors } from '../../styles/theme';
 import { useState } from 'react';
+import { useSetRecoilState } from 'recoil';
+import { filteringOption } from '../../store/person';
 
 export const FilterModal = ({ isOpen, handleModal }) => {
-  const [gender, setGender] = useState(null); // 남성 : 1, 여성 : 2
-  const [target, setTarget] = useState(null);
-  const [ageRange, setAgeRange] = useState([20, 80]);
+  const [gender, setGender] = useState(''); // 남성 : 1, 여성 : 2
+  const [target, setTarget] = useState('');
+  const [ageRange, setAgeRange] = useState([0, 120]);
+  const setFilteringOption = useSetRecoilState(filteringOption);
 
   const customMarker = (index) => {
     return (
@@ -18,16 +21,33 @@ export const FilterModal = ({ isOpen, handleModal }) => {
     );
   };
 
+  const handleReset = () => {
+    setGender('');
+    setTarget('');
+    setAgeRange([20, 80]);
+  };
+
+  const handleFilter = () => {
+    setFilteringOption({ gender, target, ageRange: ageRange });
+    handleModal(false);
+  };
+
   return (
     <Portal>
       <Modal visible={isOpen} onDismiss={() => handleModal(false)} contentContainerStyle={styles.containerStyle}>
         <View style={styles.selectors}>
           <Text style={styles.title}>성별</Text>
           <View style={{ flexDirection: 'row', gap: 6 }}>
-            <Chip style={{ backgroundColor: colors.turquoise }} onPress={() => setGender('1')}>
+            <Chip
+              style={[{ backgroundColor: colors.lightGray }, gender === '1' ? styles.active : null]}
+              onPress={() => setGender('1')}
+            >
               남성
             </Chip>
-            <Chip style={{ backgroundColor: colors.turquoise }} onPress={() => setGender('2')}>
+            <Chip
+              style={[{ backgroundColor: colors.lightGray }, gender === '2' ? styles.active : null]}
+              onPress={() => setGender('2')}
+            >
               여성
             </Chip>
           </View>
@@ -36,6 +56,7 @@ export const FilterModal = ({ isOpen, handleModal }) => {
             <RNPickerSelect
               style={{ fontSize: 24 }}
               placeholder={{ label: '대상을 선택하세요', value: null, color: colors.gray }}
+              value={target}
               onValueChange={(value) => setTarget(value)}
               items={[
                 { label: '정상 아동', value: '010' },
@@ -66,10 +87,10 @@ export const FilterModal = ({ isOpen, handleModal }) => {
             />
           </View>
           <View style={styles.btnsWrap}>
-            <Button icon="refresh" mode="outlined" textColor={colors.navy}>
+            <Button icon="refresh" mode="outlined" textColor={colors.navy} onPress={handleReset}>
               초기화
             </Button>
-            <Button icon="filter" mode="contained" buttonColor={colors.navy} style={{ flex: 1 }}>
+            <Button icon="filter" mode="contained" buttonColor={colors.navy} style={{ flex: 1 }} onPress={handleFilter}>
               필터 적용
             </Button>
           </View>
@@ -109,5 +130,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: '50%',
+  },
+
+  active: {
+    backgroundColor: colors.turquoise,
   },
 });

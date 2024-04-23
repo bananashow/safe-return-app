@@ -16,8 +16,8 @@ export const TabNavigation = () => {
             options={{
               tabBarIcon: ({ size, color }) => <MaterialIcons name={menu.icon} size={size} color={color} />,
               headerShown: false,
-              tabBarActiveTintColor: 'green',
-              tabBarInactiveTintColor: 'gray',
+              tabBarActiveTintColor: '#292f47',
+              tabBarInactiveTintColor: '#c0c0c0',
             }}
           />
         );
