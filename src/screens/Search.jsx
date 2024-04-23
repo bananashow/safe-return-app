@@ -81,8 +81,13 @@ export const Search = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.btnsWrap}>
-        <Button icon="map" mode="contained" buttonColor={colors.navy} onPress={() => console.log('지도로 보기')}>
-          지도로 보기
+        <Button
+          icon="map"
+          mode="contained"
+          buttonColor={colors.navy}
+          onPress={() => navigation.navigate('우리동네 실종자')}
+        >
+          우리동네 실종자
         </Button>
         <View style={{ flexDirection: 'row', gap: 18, alignItems: 'center' }}>
           <MaterialIcons name="refresh" size={28} color={colors.navy} onPress={handleReset} />
