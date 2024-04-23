@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useEffect, useState } from 'react';
@@ -10,7 +10,7 @@ export const Map = () => {
   const [ok, setOk] = useState(true);
   const [myGeocode, setMyGeocode] = useState();
   const [city, setCity] = useState('');
-  const [localData, setLocalData] = useState();
+  const [localData, setLocalData] = useState([]);
 
   const searchMutation = useMutation({
     mutationFn: () =>
@@ -20,7 +20,16 @@ export const Map = () => {
         },
       }),
     onError: (error) => console.error(error),
-    onSuccess: (data) => setLocalData(data.data.list),
+    onSuccess: async (data) => {
+      try {
+        const addressList = data.data.list.map((info) => geocode(info.occrAdres));
+        const resolvedAddresses = await Promise.all(addressList);
+        const filteredAddresses = resolvedAddresses.filter((address) => address !== undefined);
+        setLocalData(filteredAddresses);
+      } catch (error) {
+        console.error(error);
+      }
+    },
   });
 
   const getLocalData = async () => {
@@ -31,28 +40,26 @@ export const Map = () => {
       coords: { latitude, longitude },
     } = await Location.getCurrentPositionAsync({ accuracy: 5 });
     setMyGeocode({ latitude, longitude });
-    // 현재 위치를 주소로 변경
+
     const location = await Location.reverseGeocodeAsync({ latitude, longitude }, { useGoogleMaps: false });
     setCity(location[0].city);
 
-    // 내 주소를 가져와서 실종자 데이터 가져옴
     searchMutation.mutate();
-
-    // 다시 실종자 데이터를 반복문 돌려서 주소를 geocode로 변경 후 map에 마커처리 해야함
   };
 
   useEffect(() => {
     getLocalData();
   }, []);
 
-  //   const geocode = async () => {
-  //     const test = await Location.geocodeAsync('부산광역시 부산진구');
-  //     console.log(test);
-  //   };
-
-  //   geocode();
-
-  console.log(localData);
+  const geocode = async (address) => {
+    try {
+      const code = await Location.geocodeAsync(address);
+      return code[0];
+    } catch (error) {
+      console.error(`geocoding address Error ${address}:`, error);
+      return null;
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -67,6 +74,15 @@ export const Map = () => {
           }}
         >
           <Marker coordinate={{ latitude: myGeocode.latitude, longitude: myGeocode.longitude }} title="내 위치" />
+          {localData.map((data, idx) => {
+            return (
+              <Marker
+                key={idx}
+                coordinate={{ latitude: data.latitude, longitude: data.longitude }}
+                title="실종자 위치"
+              />
+            );
+          })}
         </MapView>
       )}
     </ScrollView>
