@@ -1,17 +1,19 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Button, Chip, Modal, Portal } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
-import { colors } from '../../styles/theme';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import { colors } from '../../styles/theme';
 import { useState } from 'react';
 
 export const FilterModal = ({ isOpen, handleModal }) => {
-  const [rangeValues, setRangeValues] = useState([20, 80]);
+  const [gender, setGender] = useState(null); // 남성 : 1, 여성 : 2
+  const [target, setTarget] = useState(null);
+  const [ageRange, setAgeRange] = useState([20, 80]);
 
-  const renderCustomMarker = (value, index, step, markerProps) => {
+  const customMarker = (index) => {
     return (
-      <View key={index} style={styles.marker}>
-        <Text style={styles.markerText}>{value}</Text>
+      <View style={styles.marker}>
+        <Text>{ageRange[index]}</Text>
       </View>
     );
   };
@@ -21,11 +23,11 @@ export const FilterModal = ({ isOpen, handleModal }) => {
       <Modal visible={isOpen} onDismiss={() => handleModal(false)} contentContainerStyle={styles.containerStyle}>
         <View style={styles.selectors}>
           <Text style={styles.title}>성별</Text>
-          <View style={{ flexDirection: 'row', gap: 4 }}>
-            <Chip style={{ backgroundColor: colors.turquoise }} onPress={() => console.log('Pressed')}>
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+            <Chip style={{ backgroundColor: colors.turquoise }} onPress={() => setGender('1')}>
               남성
             </Chip>
-            <Chip style={{ backgroundColor: colors.turquoise }} onPress={() => console.log('Pressed')}>
+            <Chip style={{ backgroundColor: colors.turquoise }} onPress={() => setGender('2')}>
               여성
             </Chip>
           </View>
@@ -34,7 +36,7 @@ export const FilterModal = ({ isOpen, handleModal }) => {
             <RNPickerSelect
               style={{ fontSize: 24 }}
               placeholder={{ label: '대상을 선택하세요', value: null, color: colors.gray }}
-              onValueChange={(value) => console.log(value)}
+              onValueChange={(value) => setTarget(value)}
               items={[
                 { label: '정상 아동', value: '010' },
                 { label: '가출인', value: '020' },
@@ -48,16 +50,19 @@ export const FilterModal = ({ isOpen, handleModal }) => {
             />
           </View>
           <View>
-            <Text style={styles.title}>당시 나이</Text>
+            <Text style={{ ...styles.title, marginBottom: 1 }}>당시 나이</Text>
             <MultiSlider
               isMarkersSeparated={true}
-              values={rangeValues}
-              sliderLength={280}
-              onValuesChange={(values) => setRangeValues(values)}
+              values={ageRange}
+              sliderLength={380}
+              onValuesChange={(values) => setAgeRange(values)}
               min={0}
               max={100}
               step={1}
-              customMarker={renderCustomMarker}
+              customMarkerLeft={() => customMarker(0)}
+              customMarkerRight={() => customMarker(1)}
+              selectedStyle={{ backgroundColor: colors.gray }}
+              unselectedStyle={{ backgroundColor: colors.lightGray }}
             />
           </View>
           <View style={styles.btnsWrap}>
@@ -77,7 +82,7 @@ export const FilterModal = ({ isOpen, handleModal }) => {
 const styles = StyleSheet.create({
   containerStyle: { backgroundColor: 'white', padding: 20 },
 
-  selectors: { gap: 24, color: 'red' },
+  selectors: { gap: 24 },
   selector: {
     backgroundColor: colors.lightGray,
     paddingVertical: 8,
@@ -95,5 +100,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginBottom: -12,
+  },
+
+  marker: {
+    width: 25,
+    height: 25,
+    backgroundColor: colors.turquoise,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: '50%',
   },
 });
