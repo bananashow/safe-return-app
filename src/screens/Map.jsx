@@ -1,10 +1,12 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { Image, ScrollView, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useEffect, useState } from 'react';
 import { SAFE_URL, SAFE_ID, SAFE_KEY } from '@env';
 import { useMutation } from 'react-query';
 import axios from 'axios';
+import noImage from '../assets/no-image.jpg';
+import { colors } from '../styles/theme';
 
 export const Map = () => {
   const [ok, setOk] = useState(true);
@@ -22,12 +24,17 @@ export const Map = () => {
     onError: (error) => console.error(error),
     onSuccess: async (data) => {
       try {
-        const addressList = data.data.list.map((info) => geocode(info.occrAdres));
-        const resolvedAddresses = await Promise.all(addressList);
-        const filteredAddresses = resolvedAddresses.filter((address) => address !== undefined);
+        const infoListPromises = data.data.list.map(async (info) => ({
+          geocode: await geocode(info.occrAdres),
+          name: info.nm,
+          image: info.tknphotoFile,
+        }));
+
+        const infoList = await Promise.all(infoListPromises);
+        const filteredAddresses = infoList.filter((item) => item.geocode !== undefined && item.geocode !== null);
         setLocalData(filteredAddresses);
       } catch (error) {
-        console.error(error);
+        console.error('localData error:', error);
       }
     },
   });
@@ -74,15 +81,33 @@ export const Map = () => {
           }}
         >
           <Marker coordinate={{ latitude: myGeocode.latitude, longitude: myGeocode.longitude }} title="내 위치" />
-          {localData.map((data, idx) => {
-            return (
-              <Marker
-                key={idx}
-                coordinate={{ latitude: data.latitude, longitude: data.longitude }}
-                title="실종자 위치"
-              />
-            );
-          })}
+          {localData &&
+            localData.map((data, idx) => {
+              if (data.geocode) {
+                return (
+                  <Marker
+                    key={idx}
+                    coordinate={{
+                      latitude: data.geocode.latitude,
+                      longitude: data.geocode.longitude,
+                    }}
+                    title={data.name}
+                  >
+                    <Image
+                      source={data.image ? { url: `data:image/jpeg;base64,${data.image}` } : noImage}
+                      style={{
+                        width: 50,
+                        height: 50,
+                        borderRadius: '50%',
+                        borderWidth: 1,
+                        borderColor: colors.lightGray,
+                      }}
+                    />
+                  </Marker>
+                );
+              }
+              return null;
+            })}
         </MapView>
       )}
     </ScrollView>
