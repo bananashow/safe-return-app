@@ -98,7 +98,7 @@ export const Map = () => {
                       style={{
                         width: 50,
                         height: 50,
-                        borderRadius: '50%',
+                        borderRadius: 50,
                         borderWidth: 1,
                         borderColor: colors.lightGray,
                       }}

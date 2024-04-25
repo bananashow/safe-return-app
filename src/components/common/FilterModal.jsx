@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.turquoise,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: '50%',
+    borderRadius: 50,
   },
 
   active: {

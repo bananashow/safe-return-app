@@ -67,7 +67,11 @@ const styles = StyleSheet.create({
   newsContainer: {
     flexDirection: 'row',
     width: '100%',
-    // gap: 1.7,
+  },
+
+  logo: {
+    height: 100,
+    marginTop: 60,
   },
 
   cardContainer: {
